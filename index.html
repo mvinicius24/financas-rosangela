@@ -60,7 +60,6 @@
             font-size: 0.9rem;
         }
 
-        /* Botão do Painel Admin */
         .admin-toggle-btn {
             background: #f1f5f9;
             color: #475569;
@@ -75,14 +74,11 @@
             gap: 6px;
             margin: 0 auto 20px auto;
             width: fit-content;
-            box-shadow: none;
             transition: all 0.2s;
         }
         .admin-toggle-btn:hover {
             background: #e2e8f0;
             color: #1e293b;
-            transform: none;
-            box-shadow: none;
         }
         .admin-toggle-btn.active {
             background: #fef3c7;
@@ -90,7 +86,6 @@
             border-color: #fcd34d;
         }
 
-        /* Card de Destaque do Total */
         .total-card {
             background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
             color: white;
@@ -138,7 +133,6 @@
             gap: 8px;
         }
 
-        /* Seção Admin */
         #adminSection {
             display: none;
             background: #fffbeb;
@@ -154,11 +148,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Formulários */
-        .form-group {
-            margin-bottom: 14px;
-        }
-
+        .form-group { margin-bottom: 14px; }
         .form-group label {
             display: block;
             margin-bottom: 6px;
@@ -167,10 +157,7 @@
             color: #475569;
         }
 
-        .input-icon-wrapper {
-            position: relative;
-        }
-
+        .input-icon-wrapper { position: relative; }
         .input-icon-wrapper i {
             position: absolute;
             left: 12px;
@@ -215,26 +202,15 @@
             align-items: center;
             gap: 8px;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
         }
 
         button:hover {
             background-color: var(--primary-hover);
             transform: translateY(-1px);
-            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
         }
 
-        #adminSection button {
-            background-color: #d97706;
-        }
-        #adminSection button:hover {
-            background-color: #b45309;
-        }
-
-        /* Cards do Histórico */
-        .history {
-            margin-top: 10px;
-        }
+        #adminSection button { background-color: #d97706; }
+        #adminSection button:hover { background-color: #b45309; }
 
         .item-card {
             background: #ffffff;
@@ -242,7 +218,7 @@
             padding: 16px;
             border-radius: 16px;
             margin-bottom: 14px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
@@ -259,25 +235,18 @@
             gap: 10px;
         }
 
-        .item-info {
-            flex-grow: 1;
-        }
-        .item-info.clickable {
-            cursor: pointer;
-        }
-
+        .item-info { flex-grow: 1; }
+        .item-info.clickable { cursor: pointer; }
         .item-info h4 {
             margin: 0 0 4px 0;
             font-size: 1rem;
             color: #0f172a;
             font-weight: 700;
         }
-
         .item-info h4 i {
             font-size: 0.8rem;
             color: var(--admin-mode-color);
             margin-left: 4px;
-            display: none;
         }
 
         .item-info p {
@@ -294,24 +263,19 @@
             gap: 12px;
         }
 
-        .value-text {
-            text-align: right;
-        }
-
+        .value-text { text-align: right; }
         .item-value .val {
             font-size: 1.05rem;
             font-weight: 800;
             color: #0f172a;
             display: block;
         }
-
         .item-value .lbl {
             font-size: 0.75rem;
             color: var(--text-muted);
             font-weight: 500;
         }
 
-        /* Botão de dar baixa rápido */
         .btn-quick-pay {
             background-color: var(--success);
             color: white;
@@ -319,12 +283,11 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            display: none; /* Só aparece no modo admin */
+            display: none;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             font-size: 0.85rem;
-            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
             transition: all 0.2s;
             padding: 0;
         }
@@ -366,7 +329,6 @@
             transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Modais */
         .modal {
             display: none;
             position: fixed;
@@ -424,18 +386,17 @@
         }
     </style>
 
-    <!-- Integração do Manifest e Ativação Correta do PWA -->
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0f172a">
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Service Worker registrado na rota:', reg.scope))
-            .catch(err => console.log('Erro ao registrar Service Worker:', err));
+          navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
         });
       }
     </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -453,7 +414,7 @@
     </button>
     
     <div class="total-card">
-        <span>A pagar este mês (Todo dia 15):</span>
+        <span>A pagar este mês:</span>
         <h2 id="totalMensal">R$ 0,00</h2>
     </div>
 
@@ -462,24 +423,15 @@
         <form id="compraForm">
             <div class="form-group">
                 <label for="nome">Nome da Compra</label>
-                <div class="input-icon-wrapper">
-                    <i class="fa-solid fa-tag"></i>
-                    <input type="text" id="nome" required placeholder="Ex: Blusa, Farmácia...">
-                </div>
+                <div class="input-icon-wrapper"><i class="fa-solid fa-tag"></i><input type="text" id="nome" required placeholder="Ex: Blusa, Farmácia..."></div>
             </div>
             <div class="form-group">
                 <label for="valor">Valor Total (R$)</label>
-                <div class="input-icon-wrapper">
-                    <i class="fa-solid fa-dollar-sign"></i>
-                    <input type="number" id="valor" step="0.01" required placeholder="0,00">
-                </div>
+                <div class="input-icon-wrapper"><i class="fa-solid fa-dollar-sign"></i><input type="number" id="valor" step="0.01" required placeholder="0,00"></div>
             </div>
             <div class="form-group">
                 <label for="parcelas">Número de Parcelas</label>
-                <div class="input-icon-wrapper">
-                    <i class="fa-solid fa-calendar-days"></i>
-                    <input type="number" id="parcelas" min="1" value="1" required>
-                </div>
+                <div class="input-icon-wrapper"><i class="fa-solid fa-calendar-days"></i><input type="number" id="parcelas" min="1" value="1" required></div>
             </div>
             <button type="submit"><i class="fa-solid fa-plus"></i> Adicionar ao Controle</button>
         </form>
@@ -526,10 +478,7 @@
         <h3><i class="fa-solid fa-shield-halved" style="color: var(--primary)"></i> Autenticação Admin</h3>
         <p class="lock-badge">Digite a senha para habilitar o modo de edição.</p>
         <div class="form-group">
-            <div class="input-icon-wrapper">
-                <i class="fa-solid fa-key"></i>
-                <input type="password" id="passwordInput" placeholder="Senha de acesso">
-            </div>
+            <div class="input-icon-wrapper"><i class="fa-solid fa-key"></i><input type="password" id="passwordInput" placeholder="Senha de acesso"></div>
         </div>
         <div class="btn-actions">
             <button onclick="verificarSenha()"><i class="fa-solid fa-unlock"></i> Acessar Painel</button>
@@ -540,9 +489,15 @@
 
 <script>
     const ACESSO_PERMITIDO = "1234"; 
-    let modoAdminAtivo = false;
+    
+    // CONEXÃO COM O SUPABASE (Preencha aqui com os seus dados)
+    const SUPABASE_URL = "https://dhxblepllwyreqldbhxy.supabase.co/rest/v1/";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoeGJsZXBsbHd5cmVxbGRiaHh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NDg5MzcsImV4cCI6MjA5NzQyNDkzN30.JUDrm3we2g7EZsbMwDggV_IW1HU_bVUa3QnzfLHf6Es";
+    
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let compras = JSON.parse(localStorage.getItem('compras_mae_v8')) || [];
+    let modoAdminAtivo = false;
+    let compras = [];
 
     const form = document.getElementById('compraForm');
     const listaHtml = document.getElementById('listaCompras');
@@ -556,6 +511,27 @@
 
     if (sessionStorage.getItem('app_autenticado') === 'true') {
         modoAdminAtivo = true;
+    }
+
+    // Carrega os dados direto do Supabase ao iniciar
+    async function carregarDadosSupabase() {
+        const { data, error } = await supabase
+            .from('compras_v9')
+            .select('*')
+            .order('id', { ascending: true });
+
+        if (error) {
+            console.error("Erro ao buscar dados do Supabase:", error);
+        } else {
+            compras = data.map(item => ({
+                id: item.id,
+                nome: item.nome,
+                valorTotal: parseFloat(item.valor_total),
+                numParcelas: parseInt(item.num_parcelas),
+                parcelasPagas: parseInt(item.parcelas_pagas)
+            }));
+            atualizarInterface();
+        }
     }
 
     function alternarModoAdmin() {
@@ -594,13 +570,22 @@
         return `Última em: 15/${meses[dataBase.getMonth()]}/${dataBase.getFullYear()}`;
     }
 
-    function darBaixaRapida(index) {
+    async function darBaixaRapida(index) {
         if (!modoAdminAtivo) return;
-        
         const compra = compras[index];
         if (compra.parcelasPagas < compra.numParcelas) {
-            compra.parcelasPagas += 1;
-            atualizarInterface();
+            const novasPagas = compra.parcelasPagas + 1;
+            
+            // Atualiza no banco
+            const { error } = await supabase
+                .from('compras_v9')
+                .update({ parcelas_pagas: novasPagas })
+                .eq('id', compra.id);
+
+            if (!error) {
+                compra.parcelasPagas = novasPagas;
+                atualizarInterface();
+            }
         }
     }
 
@@ -670,10 +655,9 @@
         });
 
         totalHtml.innerText = `R$ ${totalMensal.toFixed(2)}`;
-        localStorage.setItem('compras_mae_v8', JSON.stringify(compras));
     }
 
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', async function(e) {
         e.preventDefault();
         if (!modoAdminAtivo) return;
 
@@ -681,9 +665,23 @@
         const valorTotal = parseFloat(document.getElementById('valor').value);
         const numParcelas = parseInt(document.getElementById('parcelas').value);
 
-        compras.push({ nome, valorTotal, numParcelas, parcelasPagas: 0 });
-        atualizarInterface();
-        form.reset();
+        // Insere no Supabase
+        const { data, error } = await supabase
+            .from('compras_v9')
+            .insert([{ nome, valor_total: valorTotal, num_parcelas: numParcelas, parcelas_pagas: 0 }])
+            .select();
+
+        if (!error && data) {
+            compras.push({
+                id: data[0].id,
+                nome: data[0].nome,
+                valorTotal: parseFloat(data[0].valor_total),
+                numParcelas: parseInt(data[0].num_parcelas),
+                parcelasPagas: 0
+            });
+            atualizarInterface();
+            form.reset();
+        }
     });
 
     function abrirModal(index) {
@@ -699,32 +697,47 @@
 
     function fecharModal() { modal.style.display = 'none'; }
 
-    function salvarEdicao() {
+    async function salvarEdicao() {
         if (!modoAdminAtivo) return;
         const index = document.getElementById('editIndex').value;
+        const compra = compras[index];
         let pagas = parseInt(document.getElementById('editPagas').value);
         let totais = parseInt(document.getElementById('editParcelas').value);
+        let nome = document.getElementById('editNome').value;
+        let valorTotal = parseFloat(document.getElementById('editValor').value);
 
         if (pagas > totais) pagas = totais;
 
-        compras[index] = {
-            nome: document.getElementById('editNome').value,
-            valorTotal: parseFloat(document.getElementById('editValor').value),
-            numParcelas: totais,
-            parcelasPagas: pagas
-        };
+        // Atualiza no Supabase
+        const { error } = await supabase
+            .from('compras_v9')
+            .update({ nome, valor_total: valorTotal, num_parcelas: totais, parcelas_pagas: pagas })
+            .eq('id', compra.id);
 
-        atualizarInterface();
-        fecharModal();
+        if (!error) {
+            compras[index] = { id: compra.id, nome, valorTotal, numParcelas: totais, parcelasPagas: pagas };
+            atualizarInterface();
+            fecharModal();
+        }
     }
 
-    function excluirCompra() {
+    async function excluirCompra() {
         if (!modoAdminAtivo) return;
         if(confirm("Deseja mesmo excluir esta compra?")) {
             const index = document.getElementById('editIndex').value;
-            compras.splice(index, 1);
-            atualizarInterface();
-            fecharModal();
+            const compra = compras[index];
+
+            // Deleta no Supabase
+            const { error } = await supabase
+                .from('compras_v9')
+                .delete()
+                .eq('id', compra.id);
+
+            if (!error) {
+                compras.splice(index, 1);
+                atualizarInterface();
+                fecharModal();
+            }
         }
     }
 
@@ -732,7 +745,8 @@
         if (e.key === 'Enter') verificarSenha();
     });
 
-    atualizarInterface();
+    // Inicialização carregando os dados da nuvem
+    carregarDadosSupabase();
 </script>
 </body>
 </html>
