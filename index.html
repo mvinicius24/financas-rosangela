@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanças Rosângela</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --gradient-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: #ffffff;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --danger: #f43f5e;
+            --danger-hover: #e11d48;
+            --success: #10b981;
+            --success-hover: #059669;
+            --input-bg: #f8fafc;
+            --admin-mode-color: #f59e0b;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--gradient-bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 15px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            padding: 25px 20px;
+            border-radius: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            margin-top: 10px;
+            position: relative;
+        }
+
+        header h1 {
+            text-align: center;
+            margin: 0 0 5px 0;
+            font-size: 1.6rem;
+            color: #0f172a;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            text-align: center;
+            color: var(--text-muted);
+            margin: 0 0 20px 0;
+            font-size: 0.9rem;
+        }
+
+        /* Botão do Painel Admin */
+        .admin-toggle-btn {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 8px 14px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0 auto 20px auto;
+            width: fit-content;
+            box-shadow: none;
+            transition: all 0.2s;
+        }
+        .admin-toggle-btn:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+            transform: none;
+            box-shadow: none;
+        }
+        .admin-toggle-btn.active {
+            background: #fef3c7;
+            color: #d97706;
+            border-color: #fcd34d;
+        }
+
+        /* Card de Destaque do Total */
+        .total-card {
+            background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 18px;
+            box-shadow: 0 10px 15px -3px rgba(190, 18, 60, 0.3);
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .total-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .total-card span {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .total-card h2 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        section h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 15px 0;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Seção Admin */
+        #adminSection {
+            display: none;
+            background: #fffbeb;
+            border: 2px dashed #fcd34d;
+            padding: 15px;
+            border-radius: 18px;
+            margin-bottom: 25px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Formulários */
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        .input-icon-wrapper {
+            position: relative;
+        }
+
+        .input-icon-wrapper i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 12px 12px 38px;
+            background-color: var(--input-bg);
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 700;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+        }
+
+        #adminSection button {
+            background-color: #d97706;
+        }
+        #adminSection button:hover {
+            background-color: #b45309;
+        }
+
+        /* Cards do Histórico */
+        .history {
+            margin-top: 10px;
+        }
+
+        .item-card {
+            background: #ffffff;
+            border: 1px solid #f1f5f9;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .item-card:hover {
+            transform: scale(1.01);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            gap: 10px;
+        }
+
+        .item-info {
+            flex-grow: 1;
+        }
+        .item-info.clickable {
+            cursor: pointer;
+        }
+
+        .item-info h4 {
+            margin: 0 0 4px 0;
+            font-size: 1rem;
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .item-info h4 i {
+            font-size: 0.8rem;
+            color: var(--admin-mode-color);
+            margin-left: 4px;
+            display: none;
+        }
+
+        .item-info p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .item-value {
+            text-align: right;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .value-text {
+            text-align: right;
+        }
+
+        .item-value .val {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #0f172a;
+            display: block;
+        }
+
+        .item-value .lbl {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Botão de dar baixa rápido */
+        .btn-quick-pay {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: none; /* Só aparece no modo admin */
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+            transition: all 0.2s;
+            padding: 0;
+        }
+        .btn-quick-pay:hover {
+            background-color: var(--success-hover);
+            transform: scale(1.1);
+        }
+
+        .quitacao-individual-tag {
+            font-size: 0.75rem;
+            color: #475569;
+            background-color: #f1f5f9;
+            padding: 3px 8px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .quitacao-individual-tag.pronto {
+            color: #065f46;
+            background-color: #d1fae5;
+        }
+
+        .progress-wrapper {
+            background-color: #f1f5f9;
+            border-radius: 100px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            height: 100%;
+            width: 0%;
+            border-radius: 100px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Modais */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            animation: modalScale 0.25s ease-out;
+        }
+
+        @keyframes modalScale {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal h3 {
+            margin-top: 0;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #0f172a;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-danger { background: var(--danger); }
+        .btn-danger:hover { background: var(--danger-hover); }
+        .btn-secondary { background: #64748b; }
+        .btn-secondary:hover { background: #475569; }
+
+        .lock-badge {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>
+            <i class="fa-solid fa-credit-card" style="background: linear-gradient(135deg, #ff007f, #7000ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i> 
+            Finanças Rosângela
+        </h1>
+        <p>Acompanhamento prático de parcelas</p>
+    </header>
+
+    <button id="adminBtn" class="admin-toggle-btn" onclick="alternarModoAdmin()">
+        <i class="fa-solid fa-lock"></i> <span>Área do Administrador</span>
+    </button>
+    
+    <div class="total-card">
+        <span>A pagar este mês (Todo dia 15):</span>
+        <h2 id="totalMensal">R$ 0,00</h2>
+    </div>
+
+    <section id="adminSection">
+        <h3><i class="fa-solid fa-cart-plus" style="color: var(--admin-mode-color)"></i> Nova Compra (Painel Admin)</h3>
+        <form id="compraForm">
+            <div class="form-group">
+                <label for="nome">Nome da Compra</label>
+                <div class="input-icon-wrapper">
+                    <i class="fa-solid fa-tag"></i>
+                    <input type="text" id="nome" required placeholder="Ex: Blusa, Farmácia...">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="valor">Valor Total (R$)</label>
+                <div class="input-icon-wrapper">
+                    <i class="fa-solid fa-dollar-sign"></i>
+                    <input type="number" id="valor" step="0.01" required placeholder="0,00">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="parcelas">Número de Parcelas</label>
+                <div class="input-icon-wrapper">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <input type="number" id="parcelas" min="1" value="1" required>
+                </div>
+            </div>
+            <button type="submit"><i class="fa-solid fa-plus"></i> Adicionar ao Controle</button>
+        </form>
+    </section>
+
+    <section class="history">
+        <h3><i class="fa-solid fa-list-check"></i> Compras Ativas</h3>
+        <div id="listaCompras"></div>
+    </section>
+</div>
+
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h3><i class="fa-solid fa-pen-to-square" style="color: var(--primary)"></i> Editar Registro</h3>
+        <input type="hidden" id="editIndex">
+        
+        <div class="form-group">
+            <label for="editNome">Nome da Compra</label>
+            <div class="input-icon-wrapper"><i class="fa-solid fa-tag"></i><input type="text" id="editNome" required></div>
+        </div>
+        <div class="form-group">
+            <label for="editValor">Valor Total (R$)</label>
+            <div class="input-icon-wrapper"><i class="fa-solid fa-dollar-sign"></i><input type="number" id="editValor" step="0.01" required></div>
+        </div>
+        <div class="form-group">
+            <label for="editParcelas">Total de Parcelas</label>
+            <div class="input-icon-wrapper"><i class="fa-solid fa-calendar-days"></i><input type="number" id="editParcelas" min="1" required></div>
+        </div>
+        <div class="form-group">
+            <label for="editPagas">Parcelas já Pagas</label>
+            <div class="input-icon-wrapper"><i class="fa-solid fa-check-double"></i><input type="number" id="editPagas" min="0" required></div>
+        </div>
+        
+        <div class="btn-actions">
+            <button onclick="salvarEdicao()"><i class="fa-solid fa-floppy-disk"></i> Salvar Alterações</button>
+            <button class="btn-danger" onclick="excluirCompra()"><i class="fa-solid fa-trash-can"></i> Remover Compra</button>
+            <button class="btn-secondary" onclick="fecharModal()">Voltar</button>
+        </div>
+    </div>
+</div>
+
+<div id="authModal" class="modal">
+    <div class="modal-content">
+        <h3><i class="fa-solid fa-shield-halved" style="color: var(--primary)"></i> Autenticação Admin</h3>
+        <p class="lock-badge">Digite a senha para habilitar o modo de edição.</p>
+        <div class="form-group">
+            <div class="input-icon-wrapper">
+                <i class="fa-solid fa-key"></i>
+                <input type="password" id="passwordInput" placeholder="Senha de acesso">
+            </div>
+        </div>
+        <div class="btn-actions">
+            <button onclick="verificarSenha()"><i class="fa-solid fa-unlock"></i> Acessar Painel</button>
+            <button class="btn-secondary" onclick="fecharAuthModal()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ACESSO_PERMITIDO = "1234"; 
+    let modoAdminAtivo = false;
+
+    let compras = JSON.parse(localStorage.getItem('compras_mae_v8')) || [];
+
+    const form = document.getElementById('compraForm');
+    const listaHtml = document.getElementById('listaCompras');
+    const totalHtml = document.getElementById('totalMensal');
+    const modal = document.getElementById('editModal');
+    const authModal = document.getElementById('authModal');
+    const adminSection = document.getElementById('adminSection');
+    const adminBtn = document.getElementById('adminBtn');
+
+    const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+    if (sessionStorage.getItem('app_autenticado') === 'true') {
+        modoAdminAtivo = true;
+    }
+
+    function alternarModoAdmin() {
+        if (modoAdminAtivo) {
+            sessionStorage.removeItem('app_autenticado');
+            modoAdminAtivo = false;
+            atualizarInterface();
+        } else {
+            document.getElementById('passwordInput').value = '';
+            authModal.style.display = 'flex';
+            document.getElementById('passwordInput').focus();
+        }
+    }
+
+    function verificarSenha() {
+        const senhaDigitada = document.getElementById('passwordInput').value;
+        if (senhaDigitada.trim() === ACESSO_PERMITIDO) {
+            sessionStorage.setItem('app_autenticado', 'true');
+            modoAdminAtivo = true;
+            authModal.style.display = 'none';
+            atualizarInterface();
+        } else {
+            alert("Senha incorreta!");
+        }
+    }
+
+    function fecharAuthModal() { authModal.style.display = 'none'; }
+
+    function obterDataQuitacao(parcelasRestantes) {
+        if (parcelasRestantes <= 0) return "Quitado";
+        let dataBase = new Date();
+        if (dataBase.getDate() > 15) {
+            dataBase.setMonth(dataBase.getMonth() + 1);
+        }
+        dataBase.setMonth(dataBase.getMonth() + (parcelasRestantes - 1));
+        return `Última em: 15/${meses[dataBase.getMonth()]}/${dataBase.getFullYear()}`;
+    }
+
+    // NOVA FUNÇÃO: Da baixa em 1 parcela direto pelo botão rápido
+    function darBaixaRapida(index) {
+        if (!modoAdminAtivo) return;
+        
+        const compra = compras[index];
+        if (compra.parcelasPagas < compra.numParcelas) {
+            compra.parcelasPagas += 1;
+            atualizarInterface();
+        }
+    }
+
+    function atualizarInterface() {
+        listaHtml.innerHTML = '';
+        let totalMensal = 0;
+
+        if (modoAdminAtivo) {
+            adminSection.style.display = 'block';
+            adminBtn.classList.add('active');
+            adminBtn.innerHTML = `<i class="fa-solid fa-unlock-keyhole"></i> <span>Sair do Modo Admin</span>`;
+        } else {
+            adminSection.style.display = 'none';
+            adminBtn.classList.remove('active');
+            adminBtn.innerHTML = `<i class="fa-solid fa-lock"></i> <span>Área do Administrador</span>`;
+        }
+
+        if (compras.length === 0) {
+            listaHtml.innerHTML = `<p style="text-align:center; color: var(--text-muted); font-size:0.9rem; margin-top:20px;">Nenhuma compra ativa cadastrada.</p>`;
+        }
+
+        compras.forEach((compra, index) => {
+            const pagas = compra.parcelasPagas || 0;
+            const totais = compra.numParcelas;
+            const restantes = totais - pagas;
+            
+            let valorParcela = 0;
+            if (pagas < totais) {
+                valorParcela = compra.valorTotal / totais;
+                totalMensal += valorParcela;
+            }
+
+            const porcentagemProgresso = (pagas / totais) * 100;
+            const textoQuitacao = restantes <= 0 ? "Totalmente Pago 🎉" : obterDataQuitacao(restantes);
+
+            const itemCard = document.createElement('div');
+            itemCard.className = 'item-card';
+            
+            const classeClick = modoAdminAtivo ? 'clickable' : '';
+            const exibirComponentesAdmin = modoAdminAtivo ? 'inline-block' : 'none';
+            const exibirBotaoBaixa = (modoAdminAtivo && restantes > 0) ? 'flex' : 'none';
+
+            itemCard.innerHTML = `
+                <div class="item-row">
+                    <div class="item-info ${classeClick}" onclick="${modoAdminAtivo ? `abrirModal(${index})` : ''}">
+                        <h4>${compra.nome} <i class="fa-solid fa-pencil" style="display: ${exibirComponentesAdmin}"></i></h4>
+                        <p>Total: R$ ${compra.valorTotal.toFixed(2)} • (${pagas} de ${totais} pagas)</p>
+                    </div>
+                    <div class="item-value">
+                        <div class="value-text">
+                            <span class="val">R$ ${valorParcela.toFixed(2)}</span>
+                            <span class="lbl">${pagas === totais ? 'Concluído' : 'este mês'}</span>
+                        </div>
+                        <button class="btn-quick-pay" title="Dar baixa em 1 parcela" onclick="darBaixaRapida(${index})" style="display: ${exibirBotaoBaixa}">
+                            <i class="fa-solid fa-check"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="quitacao-individual-tag ${restantes <= 0 ? 'pronto' : ''}">
+                    <i class="fa-regular fa-calendar-check"></i> ${textoQuitacao}
+                </div>
+                <div class="progress-wrapper">
+                    <div class="progress-bar-fill" style="width: ${porcentagemProgresso}%; ${pagas === totais ? 'background: #10b981;' : ''}"></div>
+                </div>
+            `;
+            listaHtml.appendChild(itemCard);
+        });
+
+        totalHtml.innerText = `R$ ${totalMensal.toFixed(2)}`;
+        localStorage.setItem('compras_mae_v8', JSON.stringify(compras));
+    }
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!modoAdminAtivo) return;
+
+        const nome = document.getElementById('nome').value;
+        const valorTotal = parseFloat(document.getElementById('valor').value);
+        const numParcelas = parseInt(document.getElementById('parcelas').value);
+
+        compras.push({ nome, valorTotal, numParcelas, parcelasPagas: 0 });
+        atualizarInterface();
+        form.reset();
+    });
+
+    function abrirModal(index) {
+        if (!modoAdminAtivo) return;
+        const compra = compras[index];
+        document.getElementById('editIndex').value = index;
+        document.getElementById('editNome').value = compra.nome;
+        document.getElementById('editValor').value = compra.valorTotal;
+        document.getElementById('editParcelas').value = compra.numParcelas;
+        document.getElementById('editPagas').value = compra.parcelasPagas || 0;
+        modal.style.display = 'flex';
+    }
+
+    function fecharModal() { modal.style.display = 'none'; }
+
+    function salvarEdicao() {
+        if (!modoAdminAtivo) return;
+        const index = document.getElementById('editIndex').value;
+        let pagas = parseInt(document.getElementById('editPagas').value);
+        let totais = parseInt(document.getElementById('editParcelas').value);
+
+        if (pagas > totais) pagas = totais;
+
+        compras[index] = {
+            nome: document.getElementById('editNome').value,
+            valorTotal: parseFloat(document.getElementById('editValor').value),
+            numParcelas: totais,
+            parcelasPagas: pagas
+        };
+
+        atualizarInterface();
+        fecharModal();
+    }
+
+    function excluirCompra() {
+        if (!modoAdminAtivo) return;
+        if(confirm("Deseja mesmo excluir esta compra?")) {
+            const index = document.getElementById('editIndex').value;
+            compras.splice(index, 1);
+            atualizarInterface();
+            fecharModal();
+        }
+    }
+
+    document.getElementById('passwordInput').addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') verificarSenha();
+    });
+
+    atualizarInterface();
+</script>
+
+</body>
+</html>
