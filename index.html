@@ -396,6 +396,7 @@
       }
     </script>
     
+    <!-- SDK DO SUPABASE VIA CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -414,7 +415,7 @@
     </button>
     
     <div class="total-card">
-        <span>A pagar este mês:</span>
+        <span>A pagar este mês (Todo dia 15):</span>
         <h2 id="totalMensal">R$ 0,00</h2>
     </div>
 
@@ -443,6 +444,7 @@
     </section>
 </div>
 
+<!-- Modal de Edição -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <h3><i class="fa-solid fa-pen-to-square" style="color: var(--primary)"></i> Editar Registro</h3>
@@ -473,6 +475,7 @@
     </div>
 </div>
 
+<!-- Modal de Autenticação -->
 <div id="authModal" class="modal">
     <div class="modal-content">
         <h3><i class="fa-solid fa-shield-halved" style="color: var(--primary)"></i> Autenticação Admin</h3>
@@ -490,11 +493,16 @@
 <script>
     const ACESSO_PERMITIDO = "1234"; 
     
-    // CONEXÃO COM O SUPABASE (Preencha aqui com os seus dados)
+    // CREDENCIAIS INTEGRADAS E CORRIGIDAS
     const SUPABASE_URL = "https://dhxblepllwyreqldbhxy.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRoeGJsZXBsbHd5cmVxbGRiaHh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NDg5MzcsImV4cCI6MjA5NzQyNDkzN30.JUDrm3we2g7EZsbMwDggV_IW1HU_bVUa3QnzfLHf6Es";
     
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let supabaseClient;
+    try {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch(e) {
+        console.error("Falha ao iniciar cliente do Supabase:", e);
+    }
 
     let modoAdminAtivo = false;
     let compras = [];
@@ -513,23 +521,32 @@
         modoAdminAtivo = true;
     }
 
-    // Carrega os dados direto do Supabase ao iniciar
+    // Carrega os dados direto do Supabase ao iniciar com proteção contra travamentos
     async function carregarDadosSupabase() {
-        const { data, error } = await supabase
-            .from('compras_v9')
-            .select('*')
-            .order('id', { ascending: true });
+        try {
+            if (!supabaseClient) {
+                atualizarInterface();
+                return;
+            }
+            const { data, error } = await supabaseClient
+                .from('compras_v9')
+                .select('*')
+                .order('id', { ascending: true });
 
-        if (error) {
-            console.error("Erro ao buscar dados do Supabase:", error);
-        } else {
-            compras = data.map(item => ({
-                id: item.id,
-                nome: item.nome,
-                valorTotal: parseFloat(item.valor_total),
-                numParcelas: parseInt(item.num_parcelas),
-                parcelasPagas: parseInt(item.parcelas_pagas)
-            }));
+            if (error) {
+                console.error("Erro na consulta do Supabase:", error);
+            } else if (data) {
+                compras = data.map(item => ({
+                    id: item.id,
+                    nome: item.nome,
+                    valorTotal: parseFloat(item.valor_total),
+                    numParcelas: parseInt(item.num_parcelas),
+                    parcelasPagas: parseInt(item.parcelas_pagas)
+                }));
+            }
+        } catch (err) {
+            console.error("Erro crítico de conexão:", err);
+        } finally {
             atualizarInterface();
         }
     }
@@ -576,16 +593,17 @@
         if (compra.parcelasPagas < compra.numParcelas) {
             const novasPagas = compra.parcelasPagas + 1;
             
-            // Atualiza no banco
-            const { error } = await supabase
-                .from('compras_v9')
-                .update({ parcelas_pagas: novasPagas })
-                .eq('id', compra.id);
+            try {
+                const { error } = await supabaseClient
+                    .from('compras_v9')
+                    .update({ parcelas_pagas: novasPagas })
+                    .eq('id', compra.id);
 
-            if (!error) {
-                compra.parcelasPagas = novasPagas;
-                atualizarInterface();
-            }
+                if (!error) {
+                    compra.parcelasPagas = novasPagas;
+                    atualizarInterface();
+                }
+            } catch(e) { console.error(e); }
         }
     }
 
@@ -665,23 +683,24 @@
         const valorTotal = parseFloat(document.getElementById('valor').value);
         const numParcelas = parseInt(document.getElementById('parcelas').value);
 
-        // Insere no Supabase
-        const { data, error } = await supabase
-            .from('compras_v9')
-            .insert([{ nome, valor_total: valorTotal, num_parcelas: numParcelas, parcelas_pagas: 0 }])
-            .select();
+        try {
+            const { data, error } = await supabaseClient
+                .from('compras_v9')
+                .insert([{ nome, valor_total: valorTotal, num_parcelas: numParcelas, parcelas_pagas: 0 }])
+                .select();
 
-        if (!error && data) {
-            compras.push({
-                id: data[0].id,
-                nome: data[0].nome,
-                valorTotal: parseFloat(data[0].valor_total),
-                numParcelas: parseInt(data[0].num_parcelas),
-                parcelasPagas: 0
-            });
-            atualizarInterface();
-            form.reset();
-        }
+            if (!error && data) {
+                compras.push({
+                    id: data[0].id,
+                    nome: data[0].nome,
+                    valorTotal: parseFloat(data[0].valor_total),
+                    numParcelas: parseInt(data[0].num_parcelas),
+                    parcelasPagas: 0
+                });
+                atualizarInterface();
+                form.reset();
+            }
+        } catch(e) { console.error(e); }
     });
 
     function abrirModal(index) {
@@ -708,17 +727,18 @@
 
         if (pagas > totais) pagas = totais;
 
-        // Atualiza no Supabase
-        const { error } = await supabase
-            .from('compras_v9')
-            .update({ nome, valor_total: valorTotal, num_parcelas: totais, parcelas_pagas: pagas })
-            .eq('id', compra.id);
+        try {
+            const { error } = await supabaseClient
+                .from('compras_v9')
+                .update({ nome, valor_total: valorTotal, num_parcelas: totais, parcelas_pagas: pagas })
+                .eq('id', compra.id);
 
-        if (!error) {
-            compras[index] = { id: compra.id, nome, valorTotal, numParcelas: totais, parcelasPagas: pagas };
-            atualizarInterface();
-            fecharModal();
-        }
+            if (!error) {
+                compras[index] = { id: compra.id, nome, valorTotal, numParcelas: totais, parcelasPagas: pagas };
+                atualizarInterface();
+                fecharModal();
+            }
+        } catch(e) { console.error(e); }
     }
 
     async function excluirCompra() {
@@ -727,17 +747,18 @@
             const index = document.getElementById('editIndex').value;
             const compra = compras[index];
 
-            // Deleta no Supabase
-            const { error } = await supabase
-                .from('compras_v9')
-                .delete()
-                .eq('id', compra.id);
+            try {
+                const { error } = await supabaseClient
+                    .from('compras_v9')
+                    .delete()
+                    .eq('id', compra.id);
 
-            if (!error) {
-                compras.splice(index, 1);
-                atualizarInterface();
-                fecharModal();
-            }
+                if (!error) {
+                    compras.splice(index, 1);
+                    atualizarInterface();
+                    fecharModal();
+                }
+            } catch(e) { console.error(e); }
         }
     }
 
@@ -745,7 +766,6 @@
         if (e.key === 'Enter') verificarSenha();
     });
 
-    // Inicialização carregando os dados da nuvem
     carregarDadosSupabase();
 </script>
 </body>
