@@ -423,6 +423,15 @@
             margin-bottom: 10px;
         }
     </style>
+        <!-- Link para o Manifest e Ícone do App -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+      }
+    </script>
+
 </head>
 <body>
 
